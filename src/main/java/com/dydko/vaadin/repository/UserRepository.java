@@ -1,6 +1,7 @@
 package com.dydko.vaadin.repository;
 
+import com.dydko.vaadin.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<UserRepository, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 }
