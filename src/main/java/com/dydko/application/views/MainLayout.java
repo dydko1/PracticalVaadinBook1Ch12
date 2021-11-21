@@ -1,16 +1,11 @@
-package com.dydko.miroapp.views;
+package com.dydko.application.views;
 
-import com.dydko.miroapp.data.entity.User;
-import com.dydko.miroapp.security.AuthenticatedUser;
-import com.dydko.miroapp.views.about.AboutView;
-import com.dydko.miroapp.views.helloworld.HelloWorldView;
+import com.dydko.application.views.about.AboutView;
+import com.dydko.application.views.helloworld.HelloWorldView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.contextmenu.ContextMenu;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
@@ -20,15 +15,18 @@ import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.server.auth.AccessAnnotationChecker;
+import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.theme.Theme;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
+@PWA(name = "Vaadin course", shortName = "Vaadin course", enableInstallPrompt = false)
+@Theme(themeFolder = "vaadincourse")
 @PageTitle("Main")
 public class MainLayout extends AppLayout {
 
@@ -60,13 +58,7 @@ public class MainLayout extends AppLayout {
 
     private H1 viewTitle;
 
-    private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
-
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
-        this.authenticatedUser = authenticatedUser;
-        this.accessChecker = accessChecker;
-
+    public MainLayout() {
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         addToDrawer(createDrawerContent());
@@ -88,7 +80,7 @@ public class MainLayout extends AppLayout {
     }
 
     private Component createDrawerContent() {
-        H2 appName = new H2("Practical Book Spring Boot");
+        H2 appName = new H2("Vaadin course");
         appName.addClassNames("flex", "items-center", "h-xl", "m-0", "px-m", "text-m");
 
         com.vaadin.flow.component.html.Section section = new com.vaadin.flow.component.html.Section(appName,
@@ -116,16 +108,14 @@ public class MainLayout extends AppLayout {
 
     private List<RouterLink> createLinks() {
         MenuItemInfo[] menuItems = new MenuItemInfo[]{ //
-                new MenuItemInfo("Hello World", "la la-globe", HelloWorldView.class), //
+                new MenuItemInfo("Hello World", "lab la-discord", HelloWorldView.class), //
 
                 new MenuItemInfo("About", "la la-file", AboutView.class), //
 
         };
         List<RouterLink> links = new ArrayList<>();
         for (MenuItemInfo menuItemInfo : menuItems) {
-            if (accessChecker.hasAccess(menuItemInfo.getView())) {
-                links.add(createLink(menuItemInfo));
-            }
+            links.add(createLink(menuItemInfo));
 
         }
         return links;
@@ -152,28 +142,6 @@ public class MainLayout extends AppLayout {
     private Footer createFooter() {
         Footer layout = new Footer();
         layout.addClassNames("flex", "items-center", "my-s", "px-m", "py-xs");
-
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-
-            Avatar avatar = new Avatar(user.getName(), user.getProfilePictureUrl());
-            avatar.addClassNames("me-xs");
-
-            ContextMenu userMenu = new ContextMenu(avatar);
-            userMenu.setOpenOnClick(true);
-            userMenu.addItem("Logout", e -> {
-                authenticatedUser.logout();
-            });
-
-            Span name = new Span(user.getName());
-            name.addClassNames("font-medium", "text-s", "text-secondary");
-
-            layout.add(avatar, name);
-        } else {
-            Anchor loginLink = new Anchor("login", "Sign in");
-            layout.add(loginLink);
-        }
 
         return layout;
     }
