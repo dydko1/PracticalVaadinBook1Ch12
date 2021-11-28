@@ -12,6 +12,9 @@ import java.util.List;
 @Entity
 public class Company extends AbstractEntity {
 
+    public Company() {
+    }
+
     @NotBlank
     String name;
 

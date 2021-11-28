@@ -6,6 +6,9 @@ import javax.persistence.Entity;
 
 @Entity
 public class Status extends AbstractEntity {
+    public Status() {
+    }
+
     private String name;
 
     public Status(String name) {

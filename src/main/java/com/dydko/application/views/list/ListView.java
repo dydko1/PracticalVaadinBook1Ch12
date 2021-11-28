@@ -1,6 +1,7 @@
 package com.dydko.application.views.list;
 
 import com.dydko.application.views.data.entity.Contact;
+import com.dydko.application.views.data.services.CrmService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -20,13 +21,16 @@ public class ListView extends VerticalLayout {
     Grid<Contact> grid = new Grid<>(Contact.class);
     TextField filterText = new TextField();
     ContactForm form;
+    CrmService service;
 
-    public ListView() {
+    public ListView(CrmService service) {
+        this.service = service;
         addClassName("miro-list");
         setSizeFull();
         configureGrid();
         configureForm();
         add(getToolbar(), getContent());
+        updateList();
     }
 
     private void configureGrid() {
@@ -43,6 +47,7 @@ public class ListView extends VerticalLayout {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
+        filterText.addValueChangeListener(e -> updateList());
 
         Button addContactButton = new Button("Add contact");
         toolbar.add(filterText, addContactButton);
@@ -61,7 +66,11 @@ public class ListView extends VerticalLayout {
     }
 
     private void configureForm() {
-        form = new ContactForm(Collections.emptyList(), Collections.emptyList());
+        form = new ContactForm(Collections.emptyList(), Collections.emptyList() );
         form.setWidth("25em");
+    }
+
+    private void updateList() {
+        grid.setItems(service.findAllContacts(filterText.getValue()));
     }
 }

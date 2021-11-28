@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 public class Contact extends AbstractEntity {
+    public Contact() {
+    }
 
     @NotEmpty
     private String firstName = "";
