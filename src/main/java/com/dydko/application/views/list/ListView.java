@@ -31,6 +31,7 @@ public class ListView extends VerticalLayout {
         configureForm();
         add(getToolbar(), getContent());
         updateList();
+        closeEditor();
     }
 
     private void configureGrid() {
@@ -40,6 +41,17 @@ public class ListView extends VerticalLayout {
         grid.addColumn(cont -> cont.getStatus().getName()).setHeader("Status");
         grid.addColumn(contact -> contact.getCompany().getName()).setHeader("Company");
         grid.getColumns().forEach(column->column.setAutoWidth(true));
+        grid.asSingleSelect().addValueChangeListener(e->editContact(e.getValue()));
+    }
+
+    private void editContact(Contact contact) {
+        if(contact==null)
+            closeEditor();
+        else {
+            form.setContact(contact);
+            form.setVisible(true);
+            addClassName("editing");
+        }
     }
 
     private HorizontalLayout getToolbar() {
@@ -50,6 +62,8 @@ public class ListView extends VerticalLayout {
         filterText.addValueChangeListener(e -> updateList());
 
         Button addContactButton = new Button("Add contact");
+        addContactButton.addClickListener(click->addContact());
+
         toolbar.add(filterText, addContactButton);
         toolbar.addClassName("toolBar");
         toolbar.setId("Miro1");
@@ -66,11 +80,38 @@ public class ListView extends VerticalLayout {
     }
 
     private void configureForm() {
-        form = new ContactForm(Collections.emptyList(), Collections.emptyList() );
+        form = new ContactForm(Collections.emptyList(), Collections.emptyList());
         form.setWidth("25em");
+
+        form.addListener(ContactForm.SaveEvent.class, this::saveContact);
+        form.addListener(ContactForm.DeleteEvent.class, this::deleteContact);
+        form.addListener(ContactForm.CloseEvent.class, e -> closeEditor());
     }
 
     private void updateList() {
         grid.setItems(service.findAllContacts(filterText.getValue()));
+    }
+
+    private void closeEditor() {
+        form.setContact(null);
+        form.setVisible(false);
+        removeClassName("editing");
+    }
+
+    private void addContact(){
+        grid.asSingleSelect().clear();
+        editContact(new Contact());
+    }
+
+    private void saveContact(ContactForm.SaveEvent event) {
+        service.saveContact(event.getContact());
+        updateList();
+        closeEditor();
+    }
+
+    private void deleteContact(ContactForm.DeleteEvent event) {
+        service.deleteContact(event.getContact());
+        updateList();
+        closeEditor();
     }
 }
