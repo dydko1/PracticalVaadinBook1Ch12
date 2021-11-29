@@ -1,6 +1,6 @@
 package com.dydko.application.views.empty;
 
-import com.dydko.application.views.MainLayout;
+import com.dydko.application.views.MainLayout_old;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
@@ -10,8 +10,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
 @PageTitle("Empty")
-@Route(value = "empty", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
+@Route(value = "empty", layout = MainLayout_old.class)
+@RouteAlias(value = "empty", layout = MainLayout_old.class)
 public class EmptyView extends VerticalLayout {
 
     public EmptyView() {
