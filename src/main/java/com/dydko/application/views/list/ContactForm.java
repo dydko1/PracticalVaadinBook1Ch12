@@ -46,7 +46,6 @@ public class ContactForm extends FormLayout {
         company.setItemLabelGenerator(Company::getName);
         status.setItems(statuses);
         status.setItemLabelGenerator(Status::getName);
-
         add(firstName,
                 lastName,
                 email,
@@ -63,13 +62,19 @@ public class ContactForm extends FormLayout {
         save.addClickShortcut(Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);
 
-        save.addClickListener(e -> validateAndSave());
-        delete.addClickListener(e -> fireEvent(new DeleteEvent(this, contact)));
-        close.addClickListener(e -> fireEvent(new CloseEvent(this)));
+        save.addClickListener(event -> validateAndSave());
+        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, contact)));
+        close.addClickListener(event -> fireEvent(new CloseEvent(this)));
+
 
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
 
         return new HorizontalLayout(save, delete, close);
+    }
+
+    public void setContact(Contact contact) {
+        this.contact = contact;
+        binder.readBean(contact);
     }
 
     private void validateAndSave() {
@@ -79,18 +84,9 @@ public class ContactForm extends FormLayout {
         } catch (ValidationException e) {
             e.printStackTrace();
         }
-
     }
 
-    public void setContact(Contact contact) {
-        this.contact = contact;
-        binder.readBean(contact);
-    }
-
-    public Contact getContact() {
-        return contact;
-    }
-
+    // Events
     public static abstract class ContactFormEvent extends ComponentEvent<ContactForm> {
         private Contact contact;
 
@@ -110,11 +106,11 @@ public class ContactForm extends FormLayout {
         }
     }
 
-
     public static class DeleteEvent extends ContactFormEvent {
         DeleteEvent(ContactForm source, Contact contact) {
             super(source, contact);
         }
+
     }
 
     public static class CloseEvent extends ContactFormEvent {
