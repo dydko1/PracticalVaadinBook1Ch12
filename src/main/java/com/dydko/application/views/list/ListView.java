@@ -7,6 +7,7 @@ import com.dydko.application.views.data.services.CrmService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -29,13 +30,29 @@ public class ListView extends VerticalLayout {
 
     public ListView(CrmService service) {
         this.service = service;
-        addClassName("miro-list");
+        addClassName("list-list");
         setSizeFull();
         configureGrid();
         configureForm();
+        //
+        configureFlexLayout();
+        //
         add(getToolbar(), getContent());
         updateList();
         closeEditor();
+        //
+        grid.asSingleSelect().addValueChangeListener(event ->
+                editContact(event.getValue()));
+        //
+    }
+
+    private void configureFlexLayout() {
+        FlexLayout content = new FlexLayout(grid, form);
+        content.setFlexGrow(2, grid);
+        content.setFlexGrow(1, form);
+        content.setFlexShrink(0, form);
+        content.addClassNames("content", "gap-m");
+        content.setSizeFull();
     }
 
     private void configureGrid() {
@@ -44,12 +61,12 @@ public class ListView extends VerticalLayout {
         grid.setColumns("firstName", "lastName", "email");
         grid.addColumn(cont -> cont.getStatus().getName()).setHeader("Status");
         grid.addColumn(contact -> contact.getCompany().getName()).setHeader("Company");
-        grid.getColumns().forEach(column->column.setAutoWidth(true));
-        grid.asSingleSelect().addValueChangeListener(e->editContact(e.getValue()));
+        grid.getColumns().forEach(column -> column.setAutoWidth(true));
+        grid.asSingleSelect().addValueChangeListener(e -> editContact(e.getValue()));
     }
 
     private void editContact(Contact contact) {
-        if(contact==null)
+        if (contact == null)
             closeEditor();
         else {
             form.setContact(contact);
@@ -84,7 +101,7 @@ public class ListView extends VerticalLayout {
     }
 
     private void configureForm() {
-        form = new ContactForm(Collections.emptyList(), Collections.emptyList());
+        form = new ContactForm(service.findAllCompanies(), service.findAllStatuses());
         form.setWidth("25em");
 
         form.addListener(ContactForm.SaveEvent.class, this::saveContact);
